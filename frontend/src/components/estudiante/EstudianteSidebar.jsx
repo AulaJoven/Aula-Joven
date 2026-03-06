@@ -1,6 +1,6 @@
 // src/components/estudiante/EstudianteSidebar.jsx
 import { useAuth } from '../../context/AuthContext';
-import logoFundacion from '../../assets/logo-fundacion.png';
+import logoFundacion from '../../assets/logo-fundacion.webp';
 
 const GRADO_LABEL = g => g ? `${g}° Grado` : '';
 

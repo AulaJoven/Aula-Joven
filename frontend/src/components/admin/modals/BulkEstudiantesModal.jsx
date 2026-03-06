@@ -1,6 +1,5 @@
 // src/components/admin/modals/BulkEstudiantesModal.jsx
 import { useState, useRef } from 'react';
-import * as XLSX from 'xlsx';
 import { Modal } from '../../ui/Modal';
 import { Spinner } from '../../ui/Spinner';
 import api from '../../../services/api';
@@ -40,8 +39,9 @@ const encontrarColumna = (headers, aliases) => {
   return headers.findIndex(h => aliases.some(a => h.toLowerCase().trim().includes(a)));
 };
 
-// ── Descargar plantilla ────────────────────────────────────────────────────
-const descargarPlantilla = () => {
+// ── Descargar plantilla — xlsx se carga solo cuando se necesita ────────────
+const descargarPlantilla = async () => {
+  const XLSX = await import('xlsx');
   const ws = XLSX.utils.aoa_to_sheet([
     ['nombre', 'apellidos', 'cedula', 'grado', 'email'],
     ['María',  'González',  '112345678', '7', 'maria@example.com'],
@@ -67,18 +67,19 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
 
   const handleClose = () => { reset(); onClose(); };
 
-  // ── Parsear Excel ──────────────────────────────────────────────────────
-  const handleFile = (e) => {
+  // ── Parsear Excel — xlsx se carga solo cuando el usuario sube un archivo ─
+  const handleFile = async (e) => {
     const f = e.target.files[0];
     if (!f) return;
     reset();
 
     const reader = new FileReader();
-    reader.onload = (ev) => {
+    reader.onload = async (ev) => {
       try {
-        const wb     = XLSX.read(ev.target.result, { type: 'binary' });
-        const ws     = wb.Sheets[wb.SheetNames[0]];
-        const rows   = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
+        const XLSX = await import('xlsx');
+        const wb   = XLSX.read(ev.target.result, { type: 'binary' });
+        const ws   = wb.Sheets[wb.SheetNames[0]];
+        const rows = XLSX.utils.sheet_to_json(ws, { header: 1, defval: '' });
 
         if (rows.length < 2) {
           setParseError('El archivo está vacío o solo tiene encabezados.'); return;
@@ -86,7 +87,6 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
 
         const headers = rows[0].map(h => String(h));
 
-        // Encontrar índice de cada columna
         const idx = {};
         for (const [key, aliases] of Object.entries(COLUMN_MAP)) {
           idx[key] = encontrarColumna(headers, aliases);
@@ -251,10 +251,7 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
             </div>
           </>
         ) : (
-          /* ── Resultado ──────────────────────────────────────────────────── */
           <div className="space-y-4">
-
-            {/* Tarjetas resumen */}
             <div className="grid grid-cols-3 gap-3">
               <div className="bg-emerald-50 border border-emerald-100 rounded-xl p-4 text-center">
                 <p className="text-2xl font-bold text-emerald-600">{resultado.creados}</p>
@@ -270,7 +267,6 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             </div>
 
-            {/* Creados */}
             {resultado.creadosDetalle?.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-emerald-600 mb-2 flex items-center gap-1.5">
@@ -290,7 +286,6 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             )}
 
-            {/* Saltados */}
             {resultado.saltadosDetalle?.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-amber-600 mb-2">Ya existían en el sistema (saltados)</p>
@@ -305,7 +300,6 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
               </div>
             )}
 
-            {/* Inválidos */}
             {resultado.invalidos?.length > 0 && (
               <div>
                 <p className="text-xs font-semibold text-red-500 mb-2">Registros con error</p>

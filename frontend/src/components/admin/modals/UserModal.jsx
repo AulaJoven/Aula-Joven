@@ -47,15 +47,14 @@ export const UserModal = ({ isOpen, onClose, onSave, editingUser, rol }) => {
           ))}
         </div>
 
-        {/* Cédula */}
+        {/* Cédula — opcional para ambos roles */}
         <div>
           <label className="text-xs font-medium text-slate-600 mb-1 block">
-            Cédula {isEst ? '*' : ''}
+            Cédula <span className="text-slate-400 font-normal">(opcional)</span>
           </label>
           <input
             value={form.cedula}
             onChange={e => set('cedula', e.target.value)}
-            required={isEst}
             placeholder="Ej: 112345678"
             className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D52A0]/20 focus:border-[#3D52A0]"/>
         </div>

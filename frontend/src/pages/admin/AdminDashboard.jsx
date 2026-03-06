@@ -8,7 +8,7 @@ import { ProfesoresTab } from "./ProfesoresTab";
 import { EstudiantesTab } from "./EstudiantesTab";
 import { GruposTab } from "./GruposTab";
 import { CalendarioTab } from "./CalendarioTab";
-import logoFundacion from "../../assets/logo-fundacion.png";
+import logoFundacion from "../../assets/logo-fundacion.webp";
 
 const KeyIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

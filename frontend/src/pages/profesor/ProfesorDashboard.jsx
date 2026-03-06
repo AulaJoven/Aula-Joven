@@ -5,7 +5,7 @@ import api from '../../services/api';
 import { GruposTab } from './GruposTab';
 import { GrupoDashboard } from './GrupoDashboard';
 import { CambiarPasswordModal } from '../../components/ui/CambiarPasswordModal';
-import logoFundacion from '../../assets/logo-fundacion.png';
+import logoFundacion from '../../assets/logo-fundacion.webp';
 
 const LogoutIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">

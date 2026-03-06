@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import bgLogin from '../assets/bg-login.jpg';
-import logoFundacion from '../assets/logo-fundacion.png';
+import bgLogin from '../assets/bg-login.webp';
+import logoFundacion from '../assets/logo-fundacion.webp';
 
 const getRoleHome = (rol) => {
   if (rol === 'admin')      return '/admin';
