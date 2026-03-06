@@ -44,7 +44,7 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+    <div className="relative min-h-dvh flex items-center justify-center overflow-hidden">
 
       {/* Fondo */}
       <img src={bgLogin} alt="" className="absolute inset-0 w-full h-full object-cover" />
