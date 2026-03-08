@@ -1,14 +1,8 @@
-import nodemailer from 'nodemailer';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-const transporter = nodemailer.createTransport({
-  host: 'smtp.gmail.com',
-  port: 587,
-  secure: false, // STARTTLS
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  }
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+defaultClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+const client = new SibApiV3Sdk.TransactionalEmailsApi();
 
 const emailTemplate = (nombre, apellidos, email, tempPassword) => `
 <!DOCTYPE html>
@@ -37,7 +31,6 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
           <!-- Body -->
           <tr>
             <td style="background:#ffffff;padding:48px;">
-
               <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#1e293b;">Bienvenido, ${nombre}.</h2>
               <p style="margin:0 0 32px 0;font-size:16px;color:#64748b;line-height:1.6;">
                 Tu cuenta en la plataforma educativa Aula Joven ha sido creada exitosamente. A continuacion encontras tus credenciales de acceso.
@@ -48,7 +41,6 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
                 <tr>
                   <td style="padding:28px 32px;">
                     <p style="margin:0 0 20px 0;font-size:12px;font-weight:700;color:#3D52A0;letter-spacing:2px;text-transform:uppercase;">Credenciales de acceso</p>
-
                     <table width="100%" cellpadding="0" cellspacing="0">
                       <tr>
                         <td style="padding:10px 0;border-bottom:1px solid #E0E7FF;">
@@ -91,7 +83,6 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
               <p style="margin:0;font-size:15px;color:#64748b;line-height:1.6;">
                 Si tienes alguna consulta o problema para ingresar, comunicate con el administrador de la plataforma.
               </p>
-
             </td>
           </tr>
 
@@ -114,12 +105,13 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
 
 export const sendWelcomeEmail = async (email, nombre, apellidos, tempPassword) => {
   try {
-    await transporter.sendMail({
-      from:    `"Aula Joven - Fundacion Curridabat" <${process.env.EMAIL_USER}>`,
-      to:      email,
-      subject: `Bienvenido a Aula Joven, ${nombre}`,
-      html:    emailTemplate(nombre, apellidos, email, tempPassword),
-    });
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.to = [{ email, name: `${nombre} ${apellidos}` }];
+    sendSmtpEmail.sender = { email: 'aulajovenn@gmail.com', name: 'Aula Joven - Fundacion Curridabat' };
+    sendSmtpEmail.subject = `Bienvenido a Aula Joven, ${nombre}`;
+    sendSmtpEmail.htmlContent = emailTemplate(nombre, apellidos, email, tempPassword);
+    await client.sendTransacEmail(sendSmtpEmail);
+    console.log(`Correo enviado a ${email}`);
     return { success: true };
   } catch (error) {
     console.error('Error enviando email:', error);
