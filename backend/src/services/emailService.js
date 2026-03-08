@@ -56,7 +56,7 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
                       </tr>
                       <tr>
                         <td style="padding:10px 0;">
-                          <p style="margin:0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Contrasena temporal</p>
+                          <p style="margin:0;font-size:12px;color:#94a3b8;font-weight:600;text-transform:uppercase;letter-spacing:1px;">Contraseña temporal</p>
                           <p style="margin:8px 0 0 0;display:inline-block;">
                             <span style="background:#3D52A0;color:#ffffff;font-size:20px;font-weight:800;letter-spacing:4px;padding:10px 20px;border-radius:8px;font-family:'Courier New',monospace;">
                               ${tempPassword}
@@ -74,7 +74,7 @@ const emailTemplate = (nombre, apellidos, email, tempPassword) => `
                 <tr>
                   <td style="padding:16px 20px;">
                     <p style="margin:0;font-size:14px;color:#92400e;line-height:1.5;">
-                      <strong>Importante:</strong> Esta es una contrasena temporal. Por seguridad, te recomendamos cambiarla la primera vez que ingreses a la plataforma.
+                      <strong>Importante:</strong> Esta es una contraseña temporal. Por seguridad, te recomendamos cambiarla la primera vez que ingreses a la plataforma.
                     </p>
                   </td>
                 </tr>

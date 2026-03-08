@@ -21,7 +21,7 @@ const CheckIcon = () => (
   </svg>
 );
 
-const STEP_LABELS = { 1: 'Verificar identidad', 2: 'Ingresar codigo', 3: 'Nueva contrasena' };
+const STEP_LABELS = { 1: 'Verificar identidad', 2: 'Ingresar codigo', 3: 'Nueva contraseña' };
 
 export const CambiarPasswordModal = ({ isOpen, onClose }) => {
   const [paso,           setPaso]           = useState(PASOS.PASSWORD_ACTUAL);
@@ -92,7 +92,7 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleClose} title={paso < PASOS.EXITO ? 'Cambiar Contrasena' : ''}>
+    <Modal isOpen={isOpen} onClose={handleClose} title={paso < PASOS.EXITO ? 'Cambiar contraseña' : ''}>
       <div className="px-6 py-5">
 
         {/* Indicador de pasos */}
@@ -117,13 +117,13 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
         {paso === PASOS.PASSWORD_ACTUAL && (
           <form onSubmit={handleSolicitarCodigo} className="space-y-4">
             <p className="text-sm text-slate-500">
-              Ingresa tu contrasena actual para verificar tu identidad. Te enviaremos un codigo de seguridad a tu correo.
+              Ingresa tu contraseña actual para verificar tu identidad. Te enviaremos un codigo de seguridad a tu correo.
             </p>
             <div>
-              <label className="text-xs font-medium text-slate-600 mb-1 block">Contrasena actual *</label>
+              <label className="text-xs font-medium text-slate-600 mb-1 block">contraseña actual *</label>
               <div className="relative">
                 <input type={showPass ? 'text' : 'password'} value={passwordActual}
-                  onChange={e => setPasswordActual(e.target.value)} required placeholder="Tu contrasena actual"
+                  onChange={e => setPasswordActual(e.target.value)} required placeholder="Tu contraseña actual"
                   className="w-full px-3 py-2 pr-10 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D52A0]/20 focus:border-[#3D52A0]"/>
                 <button type="button" onClick={() => setShowPass(p => !p)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600">
@@ -182,9 +182,9 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
         {/* ── Paso 3: Nueva contraseña ── */}
         {paso === PASOS.NUEVA_PASSWORD && (
           <form onSubmit={handleCambiarPassword} className="space-y-4">
-            <p className="text-sm text-slate-500">Elige una contrasena segura de al menos 8 caracteres.</p>
+            <p className="text-sm text-slate-500">Elige una contraseña segura de al menos 8 caracteres.</p>
             <div>
-              <label className="text-xs font-medium text-slate-600 mb-1 block">Nueva contrasena *</label>
+              <label className="text-xs font-medium text-slate-600 mb-1 block">Nueva contraseña *</label>
               <div className="relative">
                 <input type={showNew ? 'text' : 'password'} value={nuevaPassword}
                   onChange={e => setNuevaPassword(e.target.value)} required placeholder="Minimo 8 caracteres"
@@ -196,13 +196,13 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
               </div>
             </div>
             <div>
-              <label className="text-xs font-medium text-slate-600 mb-1 block">Confirmar contrasena *</label>
+              <label className="text-xs font-medium text-slate-600 mb-1 block">Confirmar contraseña *</label>
               <input type="password" value={confirmar} onChange={e => setConfirmar(e.target.value)} required
-                placeholder="Repite la contrasena"
+                placeholder="Repite la contraseña"
                 className={`w-full px-3 py-2 text-sm border rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D52A0]/20 focus:border-[#3D52A0]
                   ${confirmar && confirmar !== nuevaPassword ? 'border-red-300' : 'border-slate-200'}`}/>
               {confirmar && confirmar !== nuevaPassword && (
-                <p className="text-xs text-red-500 mt-1">Las contrasenas no coinciden</p>
+                <p className="text-xs text-red-500 mt-1">Las contraseñas no coinciden</p>
               )}
             </div>
             {error && <p className="text-xs text-red-500 bg-red-50 border border-red-100 rounded-lg px-3 py-2">{error}</p>}
@@ -213,7 +213,7 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
               </button>
               <button type="submit" disabled={loading || !nuevaPassword || nuevaPassword !== confirmar}
                 className="px-4 py-2 text-sm text-white bg-[#3D52A0] hover:bg-[#2D3F8A] rounded-lg disabled:opacity-60 flex items-center gap-2">
-                {loading && <Spinner/>} Cambiar contrasena
+                {loading && <Spinner/>} Cambiar contraseña
               </button>
             </div>
           </form>
@@ -223,8 +223,8 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
         {paso === PASOS.EXITO && (
           <div className="text-center py-4">
             <div className="flex justify-center mb-4"><CheckIcon/></div>
-            <h3 className="text-lg font-bold text-slate-800 mb-2">Contrasena actualizada</h3>
-            <p className="text-sm text-slate-500 mb-6">Tu contrasena ha sido cambiada exitosamente.</p>
+            <h3 className="text-lg font-bold text-slate-800 mb-2">contraseña actualizada</h3>
+            <p className="text-sm text-slate-500 mb-6">Tu contraseña ha sido cambiada exitosamente.</p>
             <button onClick={handleClose}
               className="px-6 py-2 text-sm text-white bg-[#3D52A0] hover:bg-[#2D3F8A] rounded-lg">
               Cerrar

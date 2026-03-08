@@ -130,7 +130,7 @@ export const solicitarCodigo = async (req, res) => {
           <td style="background:#ffffff;padding:48px;">
             <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#1e293b;">Verificacion de identidad</h2>
             <p style="margin:0 0 32px 0;font-size:16px;color:#64748b;line-height:1.6;">
-              Hola ${user.nombre}, recibimos una solicitud para cambiar la contrasena de tu cuenta. Usa el siguiente codigo para continuar.
+              Hola ${user.nombre}, recibimos una solicitud para cambiar la contraseña de tu cuenta. Usa el siguiente codigo para continuar.
             </p>
             <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFF;border:1.5px solid #E0E7FF;border-radius:12px;margin-bottom:32px;">
               <tr>
@@ -145,7 +145,7 @@ export const solicitarCodigo = async (req, res) => {
               <tr>
                 <td style="padding:16px 20px;">
                   <p style="margin:0;font-size:14px;color:#92400e;line-height:1.5;">
-                    <strong>Importante:</strong> Si no solicitaste este cambio, ignora este correo. Tu contrasena actual no sera modificada.
+                    <strong>Importante:</strong> Si no solicitaste este cambio, ignora este correo. Tu contraseña actual no sera modificada.
                   </p>
                 </td>
               </tr>
