@@ -52,7 +52,7 @@ export const GrupoModal = ({ isOpen, onClose, onSave, editingGrupo, profesores }
             <select value={form.grado} onChange={e => set('grado', e.target.value)} required
               className="w-full px-3 py-2 text-sm border border-slate-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#3D52A0]/20 focus:border-[#3D52A0]">
               <option value="">Seleccionar</option>
-              {[7,8,9,10,11].map(g => <option key={g} value={g}>{g}°</option>)}
+              {[7,8,9,10,11, 12].map(g => <option key={g} value={g}>{g}°</option>)}
             </select>
           </div>
           <div>

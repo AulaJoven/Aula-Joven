@@ -1,5 +1,5 @@
 // src/components/admin/GrupoCard.jsx
-import { EditIcon, TrashIcon } from '../ui/Icons';
+import { EditIcon, TrashIcon, UsersIcon, BoardIcon } from '../ui/Icons';
 
 export const GrupoCard = ({ grupo, onEdit, onDelete, onVerEstudiantes, onAsistencia }) => (
   <div className="bg-white rounded-xl border border-slate-200 p-4 hover:shadow-sm transition-shadow">
@@ -19,13 +19,13 @@ export const GrupoCard = ({ grupo, onEdit, onDelete, onVerEstudiantes, onAsisten
     </div>
     <div className="mt-3 pt-3 border-t border-slate-100 flex gap-2">
       <button onClick={() => onVerEstudiantes(grupo)}
-        className="flex-1 py-1.5 text-xs font-medium text-[#3D52A0] bg-[#EEF2FF] hover:bg-[#dde6ff] rounded-lg transition-colors">
-        👥 Ver Estudiantes
-      </button>
-      <button onClick={() => onAsistencia(grupo)}
-        className="flex-1 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors">
-        📋 Asistencia
-      </button>
+  className="flex-1 py-1.5 text-xs font-medium text-[#3D52A0] bg-[#EEF2FF] hover:bg-[#dde6ff] rounded-lg transition-colors flex items-center justify-center gap-1.5">
+  <UsersIcon /> Ver Estudiantes
+</button>
+<button onClick={() => onAsistencia(grupo)}
+  className="flex-1 py-1.5 text-xs font-medium text-emerald-700 bg-emerald-50 hover:bg-emerald-100 rounded-lg transition-colors flex items-center justify-center gap-1.5">
+  <BoardIcon /> Asistencia
+</button>
     </div>
   </div>
 );

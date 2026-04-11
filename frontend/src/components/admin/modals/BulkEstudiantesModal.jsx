@@ -137,7 +137,7 @@ export const BulkEstudiantesModal = ({ isOpen, onClose, onSuccess }) => {
     }
   };
 
-  const GRADOS = { 7: '7°', 8: '8°', 9: '9°', 10: '10°', 11: '11°' };
+  const GRADOS = { 7: '7°', 8: '8°', 9: '9°', 10: '10°', 11: '11°', 12: '12°' };
 
   return (
     <Modal isOpen={isOpen} onClose={handleClose} title="Carga Masiva de Estudiantes" maxW="max-w-2xl">

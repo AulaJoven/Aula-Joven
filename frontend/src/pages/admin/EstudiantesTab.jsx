@@ -24,7 +24,7 @@ const SORT_OPTIONS = [
   { value: 'grado', label: 'Por Grado' },
 ];
 
-const GRADOS = [7, 8, 9, 10, 11];
+const GRADOS = [7, 8, 9, 10, 11,12];
 
 export const EstudiantesTab = ({
   estudiantes, loading,

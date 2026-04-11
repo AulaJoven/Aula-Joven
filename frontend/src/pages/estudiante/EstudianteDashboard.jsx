@@ -1,5 +1,5 @@
 // src/pages/estudiante/EstudianteDashboard.jsx
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAuth } from '../../context/AuthContext';
 import api from '../../services/api';
 import { EstudianteSidebar } from '../../components/estudiante/EstudianteSidebar';
@@ -9,6 +9,8 @@ import { MateriasTab }    from './tabs/MateriasTab';
 import { ActividadesTab } from './tabs/ActividadesTab';
 import { MaterialTab }    from './tabs/MaterialTab';
 import { CalendarioTab }  from './tabs/CalendarioTab';
+import { useKonamiCode }  from '../../hooks/useKonamiCode';
+import ColorGame          from '../../components/estudiante/ColorGame';
 
 const GRADO_LABEL = g => g ? `${g}° Grado` : '';
 
@@ -40,6 +42,10 @@ const EstudianteDashboard = () => {
   const [sidebarOpen,    setSidebarOpen]    = useState(false);
   const [passwordModal,  setPasswordModal]  = useState(false);
   const [historialModal, setHistorialModal] = useState(null);
+  const [showGame,       setShowGame]       = useState(false);
+
+  const openGame = useCallback(() => setShowGame(true), []);
+  useKonamiCode(openGame);
 
   useEffect(() => { fetchMaterias(); }, []);
 
@@ -83,7 +89,7 @@ const EstudianteDashboard = () => {
   const handleMateriaSelect = mat => { setMateriaActiva(mat); if (activeTab !== 'materias') fetchTabData(activeTab, mat.id); };
   const handleLogout        = ()  => { logout(); window.location.href = '/login'; };
 
-  const initials   = `${user?.nombre?.[0] || ''}${user?.apellidos?.[0] || ''}`.toUpperCase();
+  const initials    = `${user?.nombre?.[0] || ''}${user?.apellidos?.[0] || ''}`.toUpperCase();
   const activeLabel = TABS.find(t => t.id === activeTab)?.label;
 
   return (
@@ -169,6 +175,7 @@ const EstudianteDashboard = () => {
 
       <CambiarPasswordModal isOpen={passwordModal} onClose={() => setPasswordModal(false)}/>
       <HistorialModal materia={historialModal} onClose={() => setHistorialModal(null)}/>
+      {showGame && <ColorGame onClose={() => setShowGame(false)}/>} {/* ← NUEVO */}
     </div>
   );
 };
