@@ -107,7 +107,7 @@ export const sendWelcomeEmail = async (email, nombre, apellidos, tempPassword) =
   try {
     const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
     sendSmtpEmail.to = [{ email, name: `${nombre} ${apellidos}` }];
-    sendSmtpEmail.sender = { email: 'aulajovenn@gmail.com', name: 'Aula Joven - Fundacion Curridabat' };
+    sendSmtpEmail.sender = { email: 'noreply@aulajoven.org', name: 'Aula Joven - Fundacion Curridabat' };
     sendSmtpEmail.subject = `Bienvenido a Aula Joven, ${nombre}`;
     sendSmtpEmail.htmlContent = emailTemplate(nombre, apellidos, email, tempPassword);
     await client.sendTransacEmail(sendSmtpEmail);

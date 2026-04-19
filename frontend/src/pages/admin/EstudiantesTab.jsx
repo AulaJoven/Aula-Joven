@@ -9,22 +9,22 @@ import { PlusIcon, UserIcon } from '../../components/ui/Icons';
 
 const SearchIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
   </svg>
 );
 const UploadIcon = () => (
   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"/>
+    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
   </svg>
 );
 
 const SORT_OPTIONS = [
-  { value: 'az',    label: 'A → Z' },
-  { value: 'za',    label: 'Z → A' },
+  { value: 'az', label: 'A → Z' },
+  { value: 'za', label: 'Z → A' },
   { value: 'grado', label: 'Por Grado' },
 ];
 
-const GRADOS = [7, 8, 9, 10, 11,12];
+const GRADOS = [7, 8, 9, 10, 11, 12];
 
 export const EstudiantesTab = ({
   estudiantes, loading,
@@ -34,14 +34,14 @@ export const EstudiantesTab = ({
   onSave, onConfirmDelete,
   onRefresh,
 }) => {
-  const [search,     setSearch]     = useState('');
-  const [sort,       setSort]       = useState('az');
-  const [grado,      setGrado]      = useState('');
-  const [bulkModal,  setBulkModal]  = useState(false);
+  const [search, setSearch] = useState('');
+  const [sort, setSort] = useState('az');
+  const [grado, setGrado] = useState('');
+  const [bulkModal, setBulkModal] = useState(false);
 
-  const openAdd  = ()  => { setEditingUser(null); setUserModal(true); };
-  const openEdit = u   => { setEditingUser(u);    setUserModal(true); };
-  const openDel  = u   => setDelUser({ open: true, user: u, loading: false });
+  const openAdd = () => { setEditingUser(null); setUserModal(true); };
+  const openEdit = u => { setEditingUser(u); setUserModal(true); };
+  const openDel = u => setDelUser({ open: true, user: u, loading: false });
 
   const filtered = useMemo(() => {
     let list = [...estudiantes];
@@ -49,9 +49,9 @@ export const EstudiantesTab = ({
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(u =>
-        u.nombre.toLowerCase().includes(q) ||
-        u.apellidos.toLowerCase().includes(q) ||
-        u.email.toLowerCase().includes(q)
+        (u.nombre ?? '').toLowerCase().includes(q) ||
+        (u.apellidos ?? '').toLowerCase().includes(q) ||
+        (u.email ?? '').toLowerCase().includes(q)
       );
     }
 
@@ -82,14 +82,14 @@ export const EstudiantesTab = ({
           <p className="text-3xl font-bold">{loading ? '—' : estudiantes.length}</p>
         </div>
         <div className="w-12 h-12 rounded-full bg-white/20 flex items-center justify-center">
-          <UserIcon/>
+          <UserIcon />
         </div>
       </div>
 
       {/* Búsqueda, filtros y botones */}
       <div className="flex flex-col sm:flex-row gap-3 mb-4">
         <div className="relative flex-1">
-          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><SearchIcon/></span>
+          <span className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"><SearchIcon /></span>
           <input
             value={search} onChange={e => setSearch(e.target.value)}
             placeholder="Buscar por nombre o correo..."
@@ -108,12 +108,12 @@ export const EstudiantesTab = ({
         {/* Botón carga masiva */}
         <button onClick={() => setBulkModal(true)}
           className="flex items-center gap-2 px-4 py-2 bg-white border border-[#3D52A0] text-[#3D52A0] hover:bg-[#EEF2FF] text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
-          <UploadIcon/> Carga masiva
+          <UploadIcon /> Carga masiva
         </button>
         {/* Botón agregar uno */}
         <button onClick={openAdd}
           className="flex items-center gap-2 px-4 py-2 bg-[#3D52A0] hover:bg-[#2D3F8A] text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
-          <PlusIcon/> Agregar Estudiante
+          <PlusIcon /> Agregar Estudiante
         </button>
       </div>
 
@@ -140,7 +140,7 @@ export const EstudiantesTab = ({
       )}
 
       {loading ? (
-        <div className="flex justify-center py-16"><Spinner cls="w-8 h-8 text-[#3D52A0]"/></div>
+        <div className="flex justify-center py-16"><Spinner cls="w-8 h-8 text-[#3D52A0]" /></div>
       ) : filtered.length === 0 ? (
         <div className="bg-white rounded-xl border border-slate-200 p-12 text-center">
           <p className="text-slate-400 text-sm">
@@ -153,12 +153,12 @@ export const EstudiantesTab = ({
             {filtered.length} {filtered.length === 1 ? 'estudiante' : 'estudiantes'}
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            {filtered.map(u => <EstudianteCard key={u.id} user={u} onEdit={openEdit} onDelete={openDel}/>)}
+            {filtered.map(u => <EstudianteCard key={u.id} user={u} onEdit={openEdit} onDelete={openDel} />)}
           </div>
         </>
       )}
 
-      <UserModal isOpen={userModal} onClose={() => setUserModal(false)} onSave={onSave} editingUser={editingUser} rol="estudiante"/>
+      <UserModal isOpen={userModal} onClose={() => setUserModal(false)} onSave={onSave} editingUser={editingUser} rol="estudiante" />
       <DeleteModal
         isOpen={delUser.open} onClose={() => setDelUser({ open: false, user: null, loading: false })}
         onConfirm={onConfirmDelete} nombre={`${delUser.user?.nombre || ''} ${delUser.user?.apellidos || ''}`} loading={delUser.loading}
