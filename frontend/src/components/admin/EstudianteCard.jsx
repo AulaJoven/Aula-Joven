@@ -8,7 +8,16 @@ export const EstudianteCard = ({ user, onEdit, onDelete }) => (
         <Avatar nombre={user.nombre} apellidos={user.apellidos}/>
         <div>
           <p className="text-sm font-semibold text-slate-800">{user.nombre} {user.apellidos}</p>
-          {user.grado && <p className="text-xs text-slate-400">{user.grado}° grado</p>}
+          <div className="flex items-center gap-2 mt-0.5">
+            {user.grado && <p className="text-xs text-slate-400">{user.grado}° grado</p>}
+            {user.grado && !user.email_sent && (
+              <span className="text-slate-300">·</span>
+            )}
+            <span className={`flex items-center gap-1 text-xs font-medium ${user.email_sent ? 'text-emerald-500' : 'text-amber-500'}`}>
+              <span className={`w-1.5 h-1.5 rounded-full ${user.email_sent ? 'bg-emerald-400' : 'bg-amber-400'}`}/>
+              {user.email_sent ? 'Correo enviado' : 'Sin correo'}
+            </span>
+          </div>
         </div>
       </div>
       <div className="flex gap-1">

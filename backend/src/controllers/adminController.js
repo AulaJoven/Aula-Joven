@@ -8,7 +8,9 @@ export const getUsers = async (req, res) => {
   try {
     const { data, error } = await supabase
       .from("users")
-      .select("id, nombre, apellidos, email, rol, grado, activo, created_at")
+      .select(
+        "id, nombre, apellidos, email, rol, grado, activo, email_sent, created_at",
+      )
       .in("rol", ["profesor", "estudiante"])
       .order("created_at", { ascending: false });
 
@@ -45,12 +47,10 @@ export const createUser = async (req, res) => {
     const { nombre, apellidos, email, rol, grado, cedula } = req.body;
 
     if (!nombre || !apellidos || !email || !rol) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Nombre, apellidos, email y rol son requeridos",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Nombre, apellidos, email y rol son requeridos",
+      });
     }
 
     if (!["profesor", "estudiante"].includes(rol)) {
@@ -58,12 +58,10 @@ export const createUser = async (req, res) => {
     }
 
     if (rol === "estudiante" && !grado) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "El grado es requerido para estudiantes",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "El grado es requerido para estudiantes",
+      });
     }
 
     const { data: existing } = await supabase
@@ -110,6 +108,13 @@ export const createUser = async (req, res) => {
       newUser.apellidos,
       tempPassword,
     );
+
+    if (emailResult.success) {
+      await supabase
+        .from("users")
+        .update({ email_sent: true })
+        .eq("id", newUser.id);
+    }
 
     return res.status(201).json({
       success: true,
@@ -167,13 +172,11 @@ export const updateUser = async (req, res) => {
         .status(500)
         .json({ success: false, error: "Error al actualizar usuario" });
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: "Usuario actualizado",
-        data: { user: data },
-      });
+    return res.status(200).json({
+      success: true,
+      message: "Usuario actualizado",
+      data: { user: data },
+    });
   } catch (e) {
     return res
       .status(500)
@@ -416,12 +419,10 @@ export const inscribirEstudiante = async (req, res) => {
       .eq("student_id", estudiante_id);
 
     if (existing?.length > 0) {
-      return res
-        .status(409)
-        .json({
-          success: false,
-          error: "El estudiante ya está inscrito en este grupo",
-        });
+      return res.status(409).json({
+        success: false,
+        error: "El estudiante ya está inscrito en este grupo",
+      });
     }
 
     const { error } = await supabase
@@ -805,12 +806,10 @@ export const deleteFeriadosAnio = async (req, res) => {
         .status(500)
         .json({ success: false, error: "Error al eliminar eventos" });
 
-    return res
-      .status(200)
-      .json({
-        success: true,
-        message: `Eventos globales de ${year} eliminados`,
-      });
+    return res.status(200).json({
+      success: true,
+      message: `Eventos globales de ${year} eliminados`,
+    });
   } catch (e) {
     return res
       .status(500)
@@ -831,12 +830,10 @@ export const createUsersBulk = async (req, res) => {
       !Array.isArray(estudiantes) ||
       estudiantes.length === 0
     ) {
-      return res
-        .status(400)
-        .json({
-          success: false,
-          error: "Se requiere un arreglo de estudiantes",
-        });
+      return res.status(400).json({
+        success: false,
+        error: "Se requiere un arreglo de estudiantes",
+      });
     }
 
     // ── Validar campos requeridos ────────────────────────────────────────
@@ -866,7 +863,7 @@ export const createUsersBulk = async (req, res) => {
       });
     }
 
-    // ── Verificar duplicados — cédula como número ────────────────────────
+    // ── Verificar duplicados ─────────────────────────────────────────────
     const cedulas = validos.map((e) => Number(e.cedula));
     const emails = validos.map((e) => e.email.toLowerCase().trim());
 
@@ -874,7 +871,6 @@ export const createUsersBulk = async (req, res) => {
       .from("users")
       .select("email, cedula")
       .in("email", emails);
-
     const { data: existentesCedula } = await supabase
       .from("users")
       .select("email, cedula")
@@ -937,7 +933,7 @@ export const createUsersBulk = async (req, res) => {
               nombre: e.nombre.trim(),
               apellidos: e.apellidos.trim(),
               email: e.email,
-              cedula: e.cedula, // ya es Number
+              cedula: e.cedula,
               password: hashedPassword,
               rol: "estudiante",
               grado: Number(e.grado),
@@ -956,9 +952,18 @@ export const createUsersBulk = async (req, res) => {
           newUser.nombre,
           newUser.apellidos,
           tempPassword,
-        ).catch((err) =>
-          console.error(`Email fallido para ${newUser.email}:`, err),
-        );
+        )
+          .then((result) => {
+            if (result.success) {
+              supabase
+                .from("users")
+                .update({ email_sent: true })
+                .eq("id", newUser.id);
+            }
+          })
+          .catch((err) =>
+            console.error(`Email fallido para ${newUser.email}:`, err),
+          );
 
         await new Promise((resolve) => setTimeout(resolve, 500));
 
@@ -1054,12 +1059,10 @@ export const registrarAsistencia = async (req, res) => {
       .single();
 
     if (!inscripcion) {
-      return res
-        .status(404)
-        .json({
-          success: false,
-          error: "El estudiante no está inscrito en este grupo",
-        });
+      return res.status(404).json({
+        success: false,
+        error: "El estudiante no está inscrito en este grupo",
+      });
     }
 
     // Upsert — si ya existe ese día, actualizar
@@ -1118,5 +1121,54 @@ export const eliminarAsistencia = async (req, res) => {
     return res
       .status(500)
       .json({ success: false, error: "Error interno del servidor" });
+  }
+};
+
+export const resendWelcomeEmail = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("email, nombre, apellidos")
+      .eq("id", id)
+      .single();
+
+    if (error || !user)
+      return res
+        .status(404)
+        .json({ success: false, error: "Usuario no encontrado" });
+
+    const tempPassword = generateTempPassword();
+    const hashedPassword = await hashPassword(tempPassword);
+
+    // Email primero
+    const emailResult = await sendWelcomeEmail(
+      user.email,
+      user.nombre,
+      user.apellidos,
+      tempPassword,
+    );
+
+    // Solo actualizar si el email salió
+    if (emailResult.success) {
+      await supabase
+        .from("users")
+        .update({
+          password: hashedPassword,
+          email_sent: true,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", id);
+    }
+
+    return res.status(emailResult.success ? 200 : 500).json({
+      success: emailResult.success,
+      message: emailResult.success
+        ? "Correo reenviado"
+        : "Error al enviar correo",
+    });
+  } catch (e) {
+    return res.status(500).json({ success: false, error: "Error interno" });
   }
 };
