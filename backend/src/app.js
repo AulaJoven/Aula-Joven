@@ -1,6 +1,7 @@
 import 'dotenv/config';
 import express from 'express';
 import cors from 'cors';
+import supabase from './config/supabase.js'; // ← NUEVO
 
 import authRoutes       from './routes/auth.routes.js';
 import adminRoutes      from './routes/admin.routes.js';
@@ -50,6 +51,16 @@ app.use((err, req, res, next) => {
   console.error('Error:', err.message || err);
   res.status(500).json({ success: false, error: 'Error interno del servidor' });
 });
+
+// ── Limpieza de códigos expirados cada hora ────────────────────────────────
+setInterval(async () => {
+  const { error } = await supabase
+    .from('password_reset_codes')
+    .delete()
+    .lt('expires_at', new Date().toISOString());
+
+  if (!error) console.log('Codigos expirados eliminados');
+}, 60 * 60 * 1000);
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
