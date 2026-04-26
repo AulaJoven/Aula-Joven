@@ -106,15 +106,7 @@ export const CambiarPasswordModal = ({ isOpen, onClose }) => {
       setError("Ingresa el codigo de 6 digitos");
       return;
     }
-    setLoading(true);
-    try {
-      await api.post("/auth/cambiar-password/verificar", { codigo });
-      setPaso(PASOS.NUEVA_PASSWORD);
-    } catch (err) {
-      setError(err.response?.data?.error || "Codigo invalido o expirado");
-    } finally {
-      setLoading(false);
-    }
+    setPaso(PASOS.NUEVA_PASSWORD);
   };
 
   const handleReenviar = async () => {

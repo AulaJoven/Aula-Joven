@@ -228,3 +228,35 @@ export const cambiarPassword = async (req, res) => {
     return res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 };
+
+export const verificarCodigo = async (req, res) => {
+  try {
+    const userId = req.user.userId;
+    const { codigo } = req.body;
+
+    if (!codigo || codigo.length !== 6) {
+      return res.status(400).json({ success: false, error: 'Codigo invalido' });
+    }
+
+    const { data: resetCode, error } = await supabase
+      .from('password_reset_codes')
+      .select('id, expires_at')
+      .eq('user_id', userId)
+      .eq('code', codigo)
+      .single();
+
+    if (error || !resetCode) {
+      return res.status(400).json({ success: false, error: 'Codigo invalido' });
+    }
+
+    if (new Date() > new Date(resetCode.expires_at)) {
+      await supabase.from('password_reset_codes').delete().eq('id', resetCode.id);
+      return res.status(400).json({ success: false, error: 'El codigo ha expirado. Solicita uno nuevo' });
+    }
+
+    return res.status(200).json({ success: true, message: 'Codigo valido' });
+  } catch (e) {
+    console.error('Error en verificarCodigo:', e);
+    return res.status(500).json({ success: false, error: 'Error interno del servidor' });
+  }
+};
