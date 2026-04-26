@@ -1,17 +1,64 @@
 import supabase from '../config/supabase.js';
 import bcrypt from 'bcryptjs';
-import nodemailer from 'nodemailer';
 import { comparePassword } from '../utils/passwordUtils.js';
 import { generateToken } from '../utils/tokenUtils.js';
+import SibApiV3Sdk from 'sib-api-v3-sdk';
 
-const transporter = nodemailer.createTransport({
-  service: 'gmail',
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  family: 4,
-});
+const defaultClient = SibApiV3Sdk.ApiClient.instance;
+defaultClient.authentications['api-key'].apiKey = process.env.BREVO_API_KEY;
+const brevoClient = new SibApiV3Sdk.TransactionalEmailsApi();
+
+const codigoEmailTemplate = (nombre, code) => `
+<!DOCTYPE html>
+<html lang="es">
+<head><meta charset="UTF-8"/></head>
+<body style="margin:0;padding:0;background-color:#F0F2F5;font-family:'Segoe UI',Arial,sans-serif;">
+  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0F2F5;padding:40px 20px;">
+    <tr><td align="center">
+      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
+        <tr>
+          <td style="background:linear-gradient(135deg,#3D52A0 0%,#5B73C9 100%);border-radius:16px 16px 0 0;padding:40px 48px;text-align:center;">
+            <p style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:3px;text-transform:uppercase;">Fundacion Curridabat</p>
+            <h1 style="margin:0;font-size:32px;font-weight:800;color:#ffffff;">Aula Joven</h1>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#ffffff;padding:48px;">
+            <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#1e293b;">Verificacion de identidad</h2>
+            <p style="margin:0 0 32px 0;font-size:16px;color:#64748b;line-height:1.6;">
+              Hola ${nombre}, recibimos una solicitud para cambiar la contraseña de tu cuenta. Usa el siguiente codigo para continuar.
+            </p>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFF;border:1.5px solid #E0E7FF;border-radius:12px;margin-bottom:32px;">
+              <tr>
+                <td style="padding:32px;text-align:center;">
+                  <p style="margin:0 0 12px 0;font-size:12px;font-weight:700;color:#3D52A0;letter-spacing:2px;text-transform:uppercase;">Codigo de verificacion</p>
+                  <span style="background:#3D52A0;color:#ffffff;font-size:36px;font-weight:800;letter-spacing:12px;padding:16px 32px;border-radius:12px;font-family:'Courier New',monospace;">${code}</span>
+                  <p style="margin:16px 0 0 0;font-size:13px;color:#94a3b8;">Este codigo expira en 10 minutos.</p>
+                </td>
+              </tr>
+            </table>
+            <table width="100%" cellpadding="0" cellspacing="0" style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:10px;">
+              <tr>
+                <td style="padding:16px 20px;">
+                  <p style="margin:0;font-size:14px;color:#92400e;line-height:1.5;">
+                    <strong>Importante:</strong> Si no solicitaste este cambio, ignora este correo. Tu contraseña actual no sera modificada.
+                  </p>
+                </td>
+              </tr>
+            </table>
+          </td>
+        </tr>
+        <tr>
+          <td style="background:#F8FAFF;border:1px solid #E0E7FF;border-top:none;border-radius:0 0 16px 16px;padding:24px 48px;text-align:center;">
+            <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:#3D52A0;">Aula Joven — Fundacion Curridabat</p>
+            <p style="margin:0;font-size:12px;color:#94a3b8;">Este correo fue generado automaticamente. Por favor no respondas a este mensaje.</p>
+          </td>
+        </tr>
+      </table>
+    </td></tr>
+  </table>
+</body>
+</html>`;
 
 // ── LOGIN ──────────────────────────────────────────────────────────────────
 
@@ -94,7 +141,7 @@ export const solicitarCodigo = async (req, res) => {
 
     // Generar código de 6 dígitos
     const code      = Math.floor(100000 + Math.random() * 900000).toString();
-    const expiresAt = new Date(Date.now() + 10 * 60 * 1000); // 10 minutos
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
 
     const { error: insertError } = await supabase
       .from('password_reset_codes')
@@ -108,67 +155,19 @@ export const solicitarCodigo = async (req, res) => {
       return res.status(500).json({ success: false, error: 'Error al generar código' });
     }
 
-    // Enviar correo
-    await transporter.sendMail({
-      from:    `"Aula Joven - Fundacion Curridabat" <${process.env.EMAIL_USER}>`,
-      to:      user.email,
-      subject: 'Codigo de verificacion — Aula Joven',
-      html: `
-<!DOCTYPE html>
-<html lang="es">
-<head><meta charset="UTF-8"/></head>
-<body style="margin:0;padding:0;background-color:#F0F2F5;font-family:'Segoe UI',Arial,sans-serif;">
-  <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F0F2F5;padding:40px 20px;">
-    <tr><td align="center">
-      <table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-        <tr>
-          <td style="background:linear-gradient(135deg,#3D52A0 0%,#5B73C9 100%);border-radius:16px 16px 0 0;padding:40px 48px;text-align:center;">
-            <p style="margin:0 0 8px 0;font-size:13px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:3px;text-transform:uppercase;">Fundacion Curridabat</p>
-            <h1 style="margin:0;font-size:32px;font-weight:800;color:#ffffff;">Aula Joven</h1>
-          </td>
-        </tr>
-        <tr>
-          <td style="background:#ffffff;padding:48px;">
-            <h2 style="margin:0 0 8px 0;font-size:24px;font-weight:700;color:#1e293b;">Verificacion de identidad</h2>
-            <p style="margin:0 0 32px 0;font-size:16px;color:#64748b;line-height:1.6;">
-              Hola ${user.nombre}, recibimos una solicitud para cambiar la contraseña de tu cuenta. Usa el siguiente codigo para continuar.
-            </p>
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#F8FAFF;border:1.5px solid #E0E7FF;border-radius:12px;margin-bottom:32px;">
-              <tr>
-                <td style="padding:32px;text-align:center;">
-                  <p style="margin:0 0 12px 0;font-size:12px;font-weight:700;color:#3D52A0;letter-spacing:2px;text-transform:uppercase;">Codigo de verificacion</p>
-                  <span style="background:#3D52A0;color:#ffffff;font-size:36px;font-weight:800;letter-spacing:12px;padding:16px 32px;border-radius:12px;font-family:'Courier New',monospace;">${code}</span>
-                  <p style="margin:16px 0 0 0;font-size:13px;color:#94a3b8;">Este codigo expira en 10 minutos.</p>
-                </td>
-              </tr>
-            </table>
-            <table width="100%" cellpadding="0" cellspacing="0" style="background:#FFF7ED;border:1.5px solid #FED7AA;border-radius:10px;">
-              <tr>
-                <td style="padding:16px 20px;">
-                  <p style="margin:0;font-size:14px;color:#92400e;line-height:1.5;">
-                    <strong>Importante:</strong> Si no solicitaste este cambio, ignora este correo. Tu contraseña actual no sera modificada.
-                  </p>
-                </td>
-              </tr>
-            </table>
-          </td>
-        </tr>
-        <tr>
-          <td style="background:#F8FAFF;border:1px solid #E0E7FF;border-top:none;border-radius:0 0 16px 16px;padding:24px 48px;text-align:center;">
-            <p style="margin:0 0 4px 0;font-size:13px;font-weight:600;color:#3D52A0;">Aula Joven — Fundacion Curridabat</p>
-            <p style="margin:0;font-size:12px;color:#94a3b8;">Este correo fue generado automaticamente. Por favor no respondas a este mensaje.</p>
-          </td>
-        </tr>
-      </table>
-    </td></tr>
-  </table>
-</body>
-</html>`,
-    });
+    // Enviar correo via Brevo
+    const sendSmtpEmail = new SibApiV3Sdk.SendSmtpEmail();
+    sendSmtpEmail.to = [{ email: user.email, name: `${user.nombre} ${user.apellidos}` }];
+    sendSmtpEmail.sender = { email: 'noreply@aulajoven.org', name: 'Aula Joven - Fundacion Curridabat' };
+    sendSmtpEmail.subject = 'Codigo de verificacion — Aula Joven';
+    sendSmtpEmail.htmlContent = codigoEmailTemplate(user.nombre, code);
+    await brevoClient.sendTransacEmail(sendSmtpEmail);
 
+    console.log(`Codigo enviado a ${user.email}`);
     return res.status(200).json({ success: true, message: 'Codigo enviado al correo' });
+
   } catch (e) {
-    console.error(e);
+    console.error('Error en solicitarCodigo:', e);
     return res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 };
@@ -223,7 +222,9 @@ export const cambiarPassword = async (req, res) => {
     await supabase.from('password_reset_codes').delete().eq('id', resetCode.id);
 
     return res.status(200).json({ success: true, message: 'Contraseña actualizada correctamente' });
+
   } catch (e) {
+    console.error('Error en cambiarPassword:', e);
     return res.status(500).json({ success: false, error: 'Error interno del servidor' });
   }
 };
